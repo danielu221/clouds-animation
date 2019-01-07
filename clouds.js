@@ -23,6 +23,8 @@ function initClouds() {
   function init() {
     container = document.getElementById("clouds");
 
+    // var measurementMouseX = document.getElementById("");
+
     var canvas = document.createElement("canvas");
     canvas.width = 32;
     canvas.height = window.innerHeight;
@@ -149,6 +151,15 @@ function initClouds() {
   function onDocumentMouseMove(event) {
     mouseX = (event.clientX - windowHalfX) * 0.25;
     mouseY = Math.min((event.clientY - windowHalfY) * 0.15, -12);
+    mouseX= Math.round(mouseX * 100) / 100
+    mouseY= Math.round(mouseY * 100) / 100
+    
+    //wyswietl wartosci na licznikach
+    $('#measurement-mouseX-value').text(mouseX);
+    $('#measurement-mouseY-value').text(mouseY);
+
+    console.log(mouseX,mouseY)
+
   }
 
   function onWindowResize(event) {

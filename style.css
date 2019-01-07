@@ -7,8 +7,9 @@
 }
 .container-fluid{
     position: relative;
-    width: 100vw;
-    height: 100vh
+    width: 1680px;
+    height: 970px;
+    padding:0px 0px 0px 0px !important;
 }
 #cockpit{
     position: absolute;
@@ -24,4 +25,32 @@
     left: 0;
     width: 100%;
     background-color:#4584b4;
+}
+
+.measurement{
+    height:150px;
+    width:150px;
+    display: block;
+    position: absolute;
+    z-index:10;
+    text:center;
+    color:red;
+}
+
+.measurement-value{
+    font-size:45px;
+}
+
+.mouseTxt{
+    font-size:30px;
+}
+
+#measurement-mouseX{
+    top:684px;
+    left:603px;
+}
+
+#measurement-mouseY{
+    top:684px;
+    left:920px;
 }
