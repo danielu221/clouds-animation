@@ -1,7 +1,6 @@
 $(document).ready(function() {
   console.log("START");
   initClouds();
-  initCanvas();
 });
 
 function initClouds() {
@@ -21,10 +20,11 @@ function initClouds() {
   init();
 
   function init() {
+
+    //stworzenie konteneru na canve
     container = document.getElementById("clouds");
 
-    // var measurementMouseX = document.getElementById("");
-
+    //stworzenie canvy
     var canvas = document.createElement("canvas");
     canvas.width = 32;
     canvas.height = window.innerHeight;
@@ -44,10 +44,18 @@ function initClouds() {
     context.fillRect(0, 0, canvas.width, canvas.height);
 
 	// Stylizacja tła
-    container.style.backgroundColor = "0x4584b4";
-    container.style.backgroundSize = "32px 100%";
+    // container.style.backgroundColor = "0x4584b4";
+    // container.style.backgroundSize = "32px 100%";
 
-	// Umiejscowienie kamery
+  // Umiejscowienie kamery
+  
+  /**
+   * PerspectiveCamera( fov : Number, aspect : Number, near : Number, far : Number )
+        fov — Camera frustum vertical field of view.
+        aspect — Camera frustum aspect ratio.
+        near — Camera frustum near plane.
+        far — Camera frustum far plane.
+   */
     camera = new THREE.PerspectiveCamera(
       50,
       window.innerWidth / window.innerHeight,
@@ -62,25 +70,17 @@ function initClouds() {
 	// Stworzenie geometrii
     geometry = new THREE.Geometry();
 
-	// Załadowanie tekstury
+	// Załadowanie tekstury (chmurka)
     var texture = THREE.ImageUtils.loadTexture(
       "https://i.ibb.co/L6hRx8h/cloud1.png",
       null,
       animate
     );
-    texture.magFilter = THREE.LinearMipMapLinearFilter;
-	texture.minFilter = THREE.LinearMipMapLinearFilter;
-	
-	var texture2 = THREE.ImageUtils.loadTexture(
-		"http://www.rocketmans.net/Voxelspace/APACHE/cockpit.png",
-		null,
-		animate
-	  );
-	  texture2.magFilter = THREE.LinearMipMapLinearFilter;
-	  texture2.minFilter = THREE.LinearMipMapLinearFilter;
 
+    //Tworzenie mgly
     var fog = new THREE.Fog(0x4584b4, -100, 3000);
 
+    //tworzenie ShaderMaterial
     material = new THREE.ShaderMaterial({
       uniforms: {
         map: { type: "t", value: texture },
@@ -94,15 +94,13 @@ function initClouds() {
       depthTest: false,
       transparent: true
 	});
-	
-	var cockpit = new THREE.TextureLoader().load('http://www.rocketmans.net/Voxelspace/APACHE/cockpit.png');
-	var material2 = new THREE.MeshBasicMaterial( { map: cockpit } );
 
-    var plane = new THREE.Mesh(new THREE.PlaneGeometry(64, 64));
+    //stworzenie plaszczyzny, na ktorej bedzie rysowana chmura
+    var plane = new THREE.Mesh(new THREE.PlaneGeometry(65, 65));
 
+    // stworz plaszczyzny z chmurkami, w randomowych miejscach i z randomowym obrotem
     for (var i = 0; i < 8000; i++) {
       plane.position.x = Math.random() * 1000 - 500;
-      //plane.position.y = - Math.random() * Math.random() * 200 - 15;
       plane.position.y = -(Math.floor(Math.random() * (90 - 15)) - 15);
       plane.position.z = i;
       plane.rotation.z = Math.random() * Math.PI;
@@ -112,34 +110,15 @@ function initClouds() {
       THREE.GeometryUtils.merge(geometry, plane);
     }
 
+  //stworz siatke
 	mesh = new THREE.Mesh(geometry, material);
-	mesh2 = new THREE.Mesh(geometry, material2);
     scene.add(mesh);
 
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.z = -8000;
     scene.add(mesh);
 
-    // var loader = new THREE.TextureLoader();
-
-    // 	// Load an image file into a custom material
-    // var materialCockpit = new THREE.MeshLambertMaterial({
-    // 	map: loader.load('http://www.rocketmans.net/Voxelspace/APACHE/cockpit.png')
-    //   });
-
-    //   // create a plane geometry for the image with a width of 10
-    //   // and a height that preserves the image's aspect ratio
-    //   var geometryCockpit = new THREE.PlaneGeometry(1000, 1000);
-
-    //   // combine our image geometry and material into a mesh
-    //   var meshCockpit = new THREE.Mesh(geometryCockpit, materialCockpit);
-
-    //   // set the position of the image mesh in the x,y,z dimensions
-    //   meshCockpit.position.set(0,0,)
-
-    //   // add the image to the scene
-    //   scene.add(meshCockpit);
-
+    //renserer, ktory wyrenderuje scene
     renderer = new THREE.WebGLRenderer({ antialias: false });
     renderer.setSize(window.innerWidth, window.innerHeight);
     container.appendChild(renderer.domElement);
@@ -148,20 +127,20 @@ function initClouds() {
     window.addEventListener("resize", onWindowResize, false);
   }
 
+  // funkcja reagujaca na zmiany polozenia kursora myszy
+  // zmienia wskazania miernikow oraz polozenie kamery
   function onDocumentMouseMove(event) {
     mouseX = (event.clientX - windowHalfX) * 0.25;
-    mouseY = Math.min((event.clientY - windowHalfY) * 0.15, -12);
+    mouseY = (event.clientY - windowHalfY) * 0.15
     mouseX= Math.round(mouseX * 100) / 100
     mouseY= Math.round(mouseY * 100) / 100
     
     //wyswietl wartosci na licznikach
     $('#measurement-mouseX-value').text(mouseX);
     $('#measurement-mouseY-value').text(mouseY);
-
-    console.log(mouseX,mouseY)
-
   }
 
+  //reakcja na zmiane rozmiaru okna
   function onWindowResize(event) {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -169,6 +148,7 @@ function initClouds() {
     renderer.setSize(window.innerWidth, window.innerHeight);
   }
 
+  // animacja
   function animate() {
     requestAnimationFrame(animate);
 
@@ -180,83 +160,4 @@ function initClouds() {
 
     renderer.render(scene, camera);
   }
-}
-
-function initCanvas() {
-  var win = jQuery(window);
-
-  jQuery("#canvas").each(function() {
-    var canvas = this;
-    var ctx = canvas.getContext("2d");
-    var fps = 30;
-    var winWidth, winHeight;
-    var mp; //max particles
-    var particles = [];
-
-    resizeHandler();
-
-    function draw() {
-      ctx.clearRect(0, 0, winWidth, winHeight);
-
-      ctx.fillStyle = "#fff";
-      ctx.beginPath();
-      for (var i = 0; i < mp; i++) {
-        var p = particles[i];
-        ctx.moveTo(p.x, p.y);
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2, true);
-      }
-      ctx.fill();
-      update();
-    }
-
-    function update() {
-      for (var i = 0; i < mp; i++) {
-        var p = particles[i];
-        p.y += Math.cos(p.d) + 1 + p.r / 2;
-        if (p.y > winHeight) {
-          if (i % 3 > 0) {
-            //66.67% of the flakes
-            particles[i] = {
-              x: Math.random() * winWidth,
-              y: -10,
-              r: p.r,
-              d: p.d
-            };
-          }
-        }
-      }
-    }
-
-    function resizeHandler() {
-      //canvas dimensions
-      winWidth = window.innerWidth;
-      winHeight = window.innerHeight;
-
-      canvas.width = winWidth;
-      canvas.height = winHeight;
-
-      mp = 0.35 * winWidth;
-
-      particles = [];
-
-      for (var i = 0; i < mp; i++) {
-        particles.push({
-          x: Math.random() * winWidth, //x-coordinate
-          y: Math.random() * winHeight, //y-coordinate
-          r: Math.random() * 1.5, //radius
-          d: Math.random() * mp //density
-        });
-      }
-    }
-
-    win.on("resize", resizeHandler);
-
-    function step() {
-      setTimeout(function() {
-        draw();
-        requestAnimationFrame(step);
-      }, 1200 / fps);
-    }
-    step();
-  });
 }
